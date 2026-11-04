@@ -24,8 +24,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // its height and clips the top of the panel.
         let host = NSHostingController(rootView: PanelView(model: model))
         host.sizingOptions = []
+        let size = NSHostingView(rootView: PanelView(model: model)).fittingSize
+        host.view.frame = NSRect(origin: .zero, size: size)
+        host.preferredContentSize = size
         popover.contentViewController = host
-        popover.contentSize = host.view.fittingSize
+        popover.contentSize = size
 
         model.objectWillChange
             .receive(on: RunLoop.main)

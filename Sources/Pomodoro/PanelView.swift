@@ -24,21 +24,13 @@ struct PanelView: View {
             }
             .frame(width: 200, height: 200)
 
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
-                ForEach(TimerModel.presets, id: \.self) { m in
-                    Button { model.select(m) } label: {
-                        VStack(spacing: 0) {
-                            Text("\(m)").font(.system(size: 16, weight: .semibold))
-                            Text("min").font(.system(size: 10))
-                                .foregroundStyle(m == model.minutes ? darkAmber.opacity(0.8) : .secondary)
+            Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+                ForEach(0..<2) { row in
+                    GridRow {
+                        ForEach(TimerModel.presets[row * 3 ..< row * 3 + 3], id: \.self) { m in
+                            presetButton(m)
                         }
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .foregroundStyle(m == model.minutes ? darkAmber : .white)
-                        .background(m == model.minutes ? orange : tile, in: RoundedRectangle(cornerRadius: 8))
                     }
-                    .buttonStyle(.plain)
-                    .disabled(!model.canPickPreset)
-                    .opacity(model.canPickPreset || m == model.minutes ? 1 : 0.4)
                 }
             }
 
@@ -69,6 +61,23 @@ struct PanelView: View {
         .frame(width: 290)
         .background(Color(white: 0.11))
         .onAppear { openAtLogin = LoginItem.isEnabled }
+    }
+
+    private func presetButton(_ m: Int) -> some View {
+        let selected = m == model.minutes
+        return Button { model.select(m) } label: {
+            VStack(spacing: 0) {
+                Text("\(m)").font(.system(size: 16, weight: .semibold))
+                Text("min").font(.system(size: 10))
+                    .foregroundStyle(selected ? darkAmber.opacity(0.8) : .secondary)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .foregroundStyle(selected ? darkAmber : .white)
+            .background(selected ? orange : tile, in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+        .disabled(!model.canPickPreset)
+        .opacity(model.canPickPreset || selected ? 1 : 0.4)
     }
 
     private var statusLine: String {
